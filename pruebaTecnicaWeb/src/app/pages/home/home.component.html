@@ -1,0 +1,201 @@
+<app-header></app-header>
+
+<div class="container-fluid  mt-4 my-5 b">
+    <div class="container-fluid col-md-10 ">
+
+        <!-- Contenedor para los mensajes de error -->
+        <div class="alert alert-danger d-flex align-items-center" role="alert" *ngIf="errorMessage">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                <use xlink:href="#exclamation-triangle-fill" />
+            </svg>
+            <div class="alert-dismissible fade show">
+                {{ errorMessage }}
+            </div>
+        </div>
+
+        <div class="container-fluid col-md-10  ">
+            <div class="col-sm ">
+                <div class="row "></div>
+                <!-- Toolbar de la tabla-->
+                <div id=" custom-toolbar">
+                    <div class="form-inline  float-right" role="form">
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-outline-warning  btn-sm float-right"
+                                data-toggle="tooltip" data-placement="top" title="Refresh" (click)="allData()">
+                                <i class="bi bi-arrow-clockwise"></i></button>
+                            <button type="button" class="btn btn-outline-warning  btn-sm float-right"
+                                data-toggle="tooltip" data-placement="top" title="Mostar 1 registro aleatorio"
+                                (click)="loadRandom()">
+                                <i class="bi bi-1-square"></i></button>
+                            <button type="button" class="btn btn-outline-warning  btn-sm float-right"
+                                data-bs-toggle="modal" data-toggle="tooltip" data-placement="top" title="Filtrar"
+                                data-bs-target="#filterModal">
+                                <i class="bi bi-funnel"></i></button>
+                            <button type="button" class="btn btn-outline-warning  btn-sm float-right"
+                                data-bs-toggle="modal" data-toggle="tooltip" data-placement="top" title="Ordenar"
+                                data-bs-target="#orderByModal">
+                                <i class="bi bi-sort-down"></i></button>
+                        </div>
+
+                    </div>
+                </div>
+                <!--Tabla con la informacion a mostrar -->
+                <table class="table table-hover table-borderless table-sm  border-dark">
+                    <thead>
+                        <tr>
+                            <th class="fw-bolder">Nombre</th>
+                            <th class="fw-bolder">Genero</th>
+                            <th class="fw-bolder">Tipo</th>
+                            <th class="fw-bolder" style="text-align: right;"># Visualizaciones</th>
+                            <th class="fw-bolder" style="text-align: right;">Puntaje</th>
+                            <th class="fw-bolder float-right"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let ms of data">
+                            <td class="fw-light">{{ms.name}}</td>
+                            <td class="fw-light">{{ms.gender.name}}</td>
+                            <td class="fw-light">{{ms.type.name}}</td>
+                            <td class="fw-light" style="text-align: right;">{{ms.numberviews}}</td>
+                            <td class="fw-light" style="text-align: right;">{{ms.score}}</td>
+                            <td class="float-right">
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                        data-toggle="tooltip" data-placement="top" title="Dar Puntaje a {{ms.name}}"
+                                        data-bs-target="#editModal" (click)="edit(ms)"><i
+                                            class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-info  btn-sm" data-toggle="tooltip"
+                                        data-placement="top" title="Marcar como vista {{ms.name}}"
+                                        (click)="saveView(ms)"><i class="bi-check2-circle"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- Modal para actualizar el Score -->
+<div class="modal top fade" id="editModal" tabindex="-1" aria-labelledby="editModal" aria-hidden="true"
+    data-mdb-backdrop="true" data-mdb-keyboard="false">
+    <div class="modal-dialog   modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel" *ngIf="editData">Dar puntaje a: {{editData.name}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" data-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label for="selectScore">Seleccione Puntaje</label>
+                    <select class="form-control" id="selectScore" [(ngModel)]="score">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5" selected>5</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"> Close <i
+                        class="bi bi-x-circle"></i></button>
+                <button type="button" class="btn btn-outline-primary" (click)="saveScore()"
+                    data-bs-dismiss="modal">Guardar <i class="bi bi-box-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal para ordenar la tabl -->
+<div class="modal top fade" id="orderByModal" tabindex="-1" aria-labelledby="orderByModal" aria-hidden="true"
+    data-mdb-backdrop="true" data-mdb-keyboard="false">
+    <div class="modal-dialog   modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderBylLabel">Ordenar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" data-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="mb-1 form-check">
+                    <input class="form-check-input" type="checkbox" id="flexCheckDefault" [(ngModel)]="ordenValue">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Ordenar Descendentemente
+                    </label>
+                </div>
+                <div class="mb-1">
+                    <select id="orderBy" class="form-select " aria-label="Default select " [(ngModel)]="selectedField">
+                        <option [value]="item.value" *ngFor="let item of ordenar">{{item.text}}</option>
+                    </select>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" (click)="orderBy()"
+                    data-bs-dismiss="modal">Aplicar <i class="bi bi-check-circle"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal para fiiltrar los datos -->
+<div class="modal top fade" id="filterModal" tabindex="-1" aria-labelledby="filterModal" aria-hidden="true"
+    data-mdb-backdrop="true" data-mdb-keyboard="false">
+    <div class="modal-dialog   modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterlLabel">Ordenar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" data-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="mb-1 row">
+                    <label for="nombre" class="col-sm-2 col-form-label">Nombre:</label>
+                    <div class="col-md-8 col-md-offset-2">
+                        <input type="text" class="form-control" id="nombre" [(ngModel)]="nameFilter">
+                    </div>
+                </div>
+
+                <div class="mb-1 row">
+                    <label for="genderSelect" class="col-sm-2 col-form-label">Genero:</label>
+                    <div class="col-md-8 col-md-offset-2">
+                        <select id="genderSelect" class="form-select " aria-label="Default select "
+                            [(ngModel)]="genderCode">
+                            <option [value]="gender.id" *ngFor="let gender of genders">{{gender.name}}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-1 row">
+                    <label for="typeSelect" class="col-sm-2 col-form-label">Tipo:</label>
+                    <div class="col-md-8 col-md-offset-2">
+                        <select id="typeSelect" class="form-select " aria-label="Default select "
+                            [(ngModel)]="typeCode">
+                            <option [value]="type.id" *ngFor="let type of types">{{type.name}}</option>
+                        </select>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark btn-sm float-right" (click)="cleanFilter()">Limpiar <i
+                        class="bi-x-circle">
+                    </i> </button>
+                <button type="button" class="btn btn-outline-success btn-sm float-right" data-bs-dismiss="modal"
+                    (click)="filter()">Filtrar <i class="bi-funnel">
+                    </i></button>
+            </div>
+        </div>
+    </div>
+</div>
